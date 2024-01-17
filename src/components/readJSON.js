@@ -1,44 +1,65 @@
-import React from "react";
-import Papa from "papaparse";
+import React, { useState, useEffect } from "react";
+import jsonFile from "../assets/result.json";
 
-export default function ReadJSON() {
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+const ReadJson = ({ currentSeconds, onResult }) => {
+  const [jsonData, setJsonData] = useState({
+    timestamp: [],
+    layer1: [],
+    layer2: [],
+    layer3: [],
+  });
 
-    if (file) {
-      const fileName = file.name;
+  //JSONファイルの中身を配列に格納するために最初に呼び出す
+  const [jsonResultArrays, setJsonResultArrays] = useState([]);
+  useEffect(() => {
+    // Jsonデータを処理して配列に変換
+    const results = jsonFile.timestamp.map((timestamp, index) => {
+      // ミリ秒を秒に変換
+      const timestampInSeconds = timestamp / 1000;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target.result;
-
-        try {
-          const parsedData = JSON.parse(result);
-
-          // 各プロパティごとに1行ずつCSVに変換
-          const csvData = Object.keys(parsedData).reduce((acc, key) => {
-            const column = parsedData[key].map((item) => `"${item}"`).join(",");
-            return acc + `${key},${column}\n`;
-          }, "");
-
-          // CSVファイルとして保存
-          const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = `${fileName.replace(".json", "")}.csv`;
-          link.click();
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
+      return {
+        timestamp: timestampInSeconds,
+        layer1: jsonFile.layer1[index],
+        layer2: jsonFile.layer2[index],
+        layer3: jsonFile.layer3[index],
       };
+    });
+    // 結果をセット
+    setJsonResultArrays(results);
+  }, [jsonFile]);
 
-      reader.readAsText(file);
-    }
-  };
+  //動画時間に対応するjsonデータを探して返す
+  // useEffect(() => {
+  //   const matchingData = findDataForCurrentTime(currentSeconds);
+  //   setJsonData(matchingData);
+
+  //   // 結果を親コンポーネントに渡す
+  //   onResult(matchingData);
+  // }, [currentSeconds]);
+
+  // //動画時間が一致するデータを探すための関数
+  // const findDataForCurrentTime = (currentTime) => {
+  //   const matchingData = jsonResultArrays.find(
+  //     (data) => data.timestamp === currentTime
+  //   );
+  //   console.log(`マッチしたデータは`, matchingData);
+  //   return matchingData;
+  // };
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
+      <div>
+        {jsonResultArrays.map((arr, index) => (
+          <div key={index}>
+            <p>Timestamp: {arr.timestamp}</p>
+            <p>Layer1: {arr.layer1}</p>
+            <p>Layer2: {arr.layer2}</p>
+            <p>Layer3: {arr.layer3}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default ReadJson;

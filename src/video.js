@@ -2,28 +2,28 @@ import React, { useState, useRef } from "react";
 //import { ReactMediaRecorder } from "react-media-recorder";
 import ReactPlayer from "react-player";
 import styles from "./styles/video.module.css";
+import ReadJson from "./components/readJSON";
 
 const Video = () => {
   const videoURL = "result.mp4";
 
+  // const [readJsonResult, setReadJsonResult] = useState({});
+
+  // ReadJsonからの結果を受け取るコールバック
+  const handleReadJsonResult = (result) => {
+    // setReadJsonResult(result);
+    console.log(`resultは${result}`);
+  };
+
   //動画時間表示のため
-  const [currentMinutes, setCurrentMinutes] = useState(0);
   const [currentSeconds, setCurrentSeconds] = useState(0);
-  const [currentHours, setCurrentHours] = useState(0);
-  //倍速機能
+  //倍速機能用変数
   const [playbackRate, setPlaybackRate] = useState(1);
-  //10秒スキップ用
+  //10秒スキップ用変数
   const playerRef = useRef(null);
 
   const handleProgress = (state) => {
-    const totalSeconds = Math.floor(state.playedSeconds);
-    const hours = Math.floor(totalSeconds / 3600);
-    const remainingSeconds = totalSeconds % 3600;
-    const minutes = Math.floor(remainingSeconds / 60);
-    const seconds = remainingSeconds % 60;
-    setCurrentMinutes(minutes);
-    setCurrentSeconds(seconds);
-    setCurrentHours(hours);
+    setCurrentSeconds(state.playedSeconds);
   };
 
   const handlePlaybackRate = (newPlaybackRate) => {
@@ -46,23 +46,6 @@ const Video = () => {
 
   return (
     <div className={styles.wrapper}>
-      {/* <div>
-        <ReactMediaRecorder
-          video
-          render={({ status, startRecording, stopRecording }) => (
-            <div>
-              <p>{status}</p>
-              <video
-                src={videoURL}
-                controls
-                autoplay
-                loop
-                style={{ width: "60vw", height: "auto" }}
-              />
-            </div>
-          )}
-        />
-      </div> */}
       <div className={styles.videoDisplay}>
         <ReactPlayer
           ref={playerRef}
@@ -75,9 +58,7 @@ const Video = () => {
         />
       </div>
       <div className={styles.panel}>
-        <p>
-          現在の再生時間: {currentHours}時{currentMinutes}分 {currentSeconds}秒
-        </p>
+        <p>現在の再生時間: {currentSeconds}秒</p>
         <label>
           倍速：
           <select
@@ -94,6 +75,10 @@ const Video = () => {
         </label>
         <button onClick={handleSkipBackward}>10秒戻る</button>
         <button onClick={handleSkipForward}>10秒進む</button>
+        <ReadJson
+          currentSeconds={currentSeconds}
+          onResult={handleReadJsonResult}
+        />
       </div>
     </div>
   );
