@@ -1,14 +1,13 @@
 import React from "react";
-import Video from "./video";
+import Video from "./components/video";
 import "./App.css";
-// import ReadJson from "./components/readJSON";
-//import ReadJSON from "./components/readJSON";
+import VideoPlayerContainer from "./components/videoPlayerContainer";
 
 function App() {
   return (
     <div className="App">
-      <Video />
-      {/* <ReadJson /> */}
+      {/* <Video /> */}
+      <VideoPlayerContainer />
     </div>
   );
 }

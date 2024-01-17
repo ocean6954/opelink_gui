@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 //import { ReactMediaRecorder } from "react-media-recorder";
 import ReactPlayer from "react-player";
-import styles from "./styles/video.module.css";
-import ReadJson from "./components/readJSON";
-import jsonFile from "./assets/result.json";
+import styles from "../styles/video.module.css";
+// import ReadJson from "./readJSON";
+import jsonFile from "../assets/result.json";
 
 const Video = () => {
   const videoURL = "result.mp4";

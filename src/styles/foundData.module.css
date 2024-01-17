@@ -1,0 +1,5 @@
+.identificationResult {
+  display: flex;
+  background-color: salmon;
+  justify-content: center;
+}
