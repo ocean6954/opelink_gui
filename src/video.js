@@ -1,26 +1,57 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 //import { ReactMediaRecorder } from "react-media-recorder";
 import ReactPlayer from "react-player";
 import styles from "./styles/video.module.css";
 import ReadJson from "./components/readJSON";
+import jsonFile from "./assets/result.json";
 
 const Video = () => {
   const videoURL = "result.mp4";
 
-  // const [readJsonResult, setReadJsonResult] = useState({});
+  // ステートの初期化
+  const [jsonResultArray, setJsonResultArray] = useState([]);
+  const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const [foundData, setFoundData] = useState(null);
+  const [currentSeconds, setCurrentSeconds] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
 
-  // ReadJsonからの結果を受け取るコールバック
-  const handleReadJsonResult = (result) => {
-    // setReadJsonResult(result);
-    console.log(`resultは${result}`);
+  const playerRef = useRef(null);
+
+  const loadJsonData = () => {
+    // Jsonデータを処理して配列に変換
+    const results = jsonFile.timestamp.map((timestamp, index) => {
+      // ミリ秒を秒に変換
+      const timestampInSeconds = timestamp / 1000;
+      return {
+        timestamp: timestampInSeconds,
+        layer1: jsonFile.layer1[index],
+        layer2: jsonFile.layer2[index],
+        layer3: jsonFile.layer3[index],
+      };
+    });
+    // 結果をセット
+    setJsonResultArray(results);
   };
 
-  //動画時間表示のため
-  const [currentSeconds, setCurrentSeconds] = useState(0);
-  //倍速機能用変数
-  const [playbackRate, setPlaybackRate] = useState(1);
-  //10秒スキップ用変数
-  const playerRef = useRef(null);
+  const handleVideoProgress = (progress) => {
+    // 現在の動画時間を更新
+    setCurrentVideoTime(progress.playedSeconds);
+
+    // 3. 現在の動画時間に一致するtimestampをjsonResultArrayから探す処理
+    const foundItem = jsonResultArray.find(
+      (item) =>
+        Math.floor(item.timestamp) === Math.floor(progress.playedSeconds)
+    );
+
+    // 4. 見つかったデータをstateにセット
+    if (foundItem) {
+      setFoundData(foundItem);
+    }
+  };
+
+  useEffect(() => {
+    loadJsonData();
+  }, []);
 
   const handleProgress = (state) => {
     setCurrentSeconds(state.playedSeconds);
@@ -54,7 +85,7 @@ const Video = () => {
           width="100%"
           height="100%"
           playbackRate={playbackRate}
-          onProgress={handleProgress}
+          onProgress={handleVideoProgress}
         />
       </div>
       <div className={styles.panel}>
@@ -75,10 +106,20 @@ const Video = () => {
         </label>
         <button onClick={handleSkipBackward}>10秒戻る</button>
         <button onClick={handleSkipForward}>10秒進む</button>
-        <ReadJson
+        {/* <ReadJson
           currentSeconds={currentSeconds}
           onResult={handleReadJsonResult}
-        />
+        /> */}
+      </div>
+      <div className={styles.result}>
+        <h2>Found Data????</h2>
+        {foundData && (
+          <div>
+            <h2>Found Data:</h2>
+            <pre>{JSON.stringify(foundData, null, 2)}</pre>
+            {/* その他のデータ表示 */}
+          </div>
+        )}
       </div>
     </div>
   );
