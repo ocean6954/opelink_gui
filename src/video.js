@@ -44,18 +44,12 @@ const Video = () => {
     );
 
     // 4. 見つかったデータをstateにセット
-    if (foundItem) {
-      setFoundData(foundItem);
-    }
+    setFoundData(foundItem);
   };
 
   useEffect(() => {
     loadJsonData();
   }, []);
-
-  const handleProgress = (state) => {
-    setCurrentSeconds(state.playedSeconds);
-  };
 
   const handlePlaybackRate = (newPlaybackRate) => {
     setPlaybackRate(newPlaybackRate);
@@ -112,12 +106,10 @@ const Video = () => {
         /> */}
       </div>
       <div className={styles.result}>
-        <h2>Found Data????</h2>
         {foundData && (
           <div>
             <h2>Found Data:</h2>
             <pre>{JSON.stringify(foundData, null, 2)}</pre>
-            {/* その他のデータ表示 */}
           </div>
         )}
       </div>
